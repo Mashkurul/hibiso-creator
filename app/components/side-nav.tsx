@@ -95,6 +95,18 @@ const navItems: NavItem[] = [
     ),
   },
   {
+    label: "Messages",
+    href: "/messages",
+    icon: (
+      <IconWrapper>
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+          <path d="M4 7h16v10H7l-3 3V7z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+          <path d="M8 11h8M8 14h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </IconWrapper>
+    ),
+  },
+  {
     label: "Profile",
     href: "/profile",
     icon: (
