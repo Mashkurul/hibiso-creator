@@ -126,13 +126,13 @@ export default function MessagesPage() {
   return (
     <div className="mx-auto w-full max-w-[1320px] space-y-4">
       <section className="reveal-enter" style={{ animationDelay: "40ms" }}>
-        <h1 className="text-[44px] font-semibold leading-none text-[#1f2c44]">Messages</h1>
+        <h1 className="text-3xl font-semibold leading-none text-[#1f2c44] sm:text-[44px]">Messages</h1>
  
       </section>
 
       <section className="reveal-enter hover-lift overflow-hidden rounded-3xl border border-[#e6e1d9] bg-[#f7f5f0] shadow-[0_4px_14px_rgba(20,30,60,0.06)]" style={{ animationDelay: "100ms" }}>
-        <div className="grid min-h-[760px] grid-cols-[300px_1fr]">
-          <aside className="reveal-enter border-r border-[#e7e2d8] p-3" style={{ animationDelay: "160ms" }}>
+        <div className="grid min-h-[620px] grid-cols-1 md:min-h-[760px] md:grid-cols-[280px_1fr]">
+          <aside className="reveal-enter border-b border-[#e7e2d8] p-3 md:border-b-0 md:border-r" style={{ animationDelay: "160ms" }}>
             <input
               placeholder="Search creator, group, campaign..."
               className="w-full rounded-xl border border-[#d8d2c7] bg-[#f9f7f2] px-3 py-2 text-sm text-[#3b495f] outline-none focus:border-[#c7bfb1]"
@@ -215,7 +215,7 @@ export default function MessagesPage() {
                 return (
                   <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[58%] rounded-2xl border px-3 py-2 text-sm ${
+                      className={`max-w-[86%] rounded-2xl border px-3 py-2 text-sm sm:max-w-[72%] lg:max-w-[58%] ${
                         mine
                           ? "border-[#d8813f] bg-[#de8b34] text-white"
                           : "border-[#d7d2c9] bg-[#f8f6f1] text-[#2f3a50]"

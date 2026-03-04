@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -120,17 +121,40 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function SideNav() {
+type SideNavProps = {
+  mobileOpen: boolean;
+  onClose: () => void;
+};
+
+export default function SideNav({ mobileOpen, onClose }: SideNavProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="nav-enter flex min-h-screen w-full flex-col border-r border-white/10 bg-[#2a2725] text-[#b7b4bf] md:fixed md:left-0 md:top-0 md:h-screen md:w-[264px] md:min-w-[264px] md:overflow-hidden">
+    <aside
+      className={`nav-enter fixed inset-y-0 left-0 z-50 flex h-screen w-[264px] min-w-[264px] flex-col border-r border-white/10 bg-[#2a2725] text-[#b7b4bf] transition-transform duration-300 md:fixed md:left-0 md:top-0 md:z-20 md:translate-x-0 md:overflow-hidden ${
+        mobileOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div className="px-5 pb-7 pt-6">
-        <div className="mb-10 flex items-center gap-3">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#ff3ea5] via-[#ff6c56] to-[#ffb44f]">
-            <span className="text-xs font-bold text-white">hb</span>
-          </div>
-          <span className="text-[24px] font-semibold leading-none text-white">Hibis&apos;o</span>
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={onClose}
+          className="tap-press mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full text-[#d3d7e3] transition hover:bg-white/10 md:hidden"
+        >
+          <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
+        <div className="mb-8">
+          <Image
+            src="/hibiso_logo.svg"
+            alt="Hibis'o logo"
+            width={112}
+            height={112}
+            priority
+            className="h-auto w-28 max-w-full"
+          />
         </div>
 
         <div className="mb-5">
@@ -148,6 +172,7 @@ export default function SideNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onClose}
                 className={`tap-press flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   active
                     ? "bg-gradient-to-r from-[#f7a334] to-[#ee6a53] text-white"
@@ -165,6 +190,7 @@ export default function SideNav() {
       <div className="mt-auto border-t border-white/10 px-5 py-7">
         <Link
           href="/sign-out"
+          onClick={onClose}
           className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-medium hover:bg-white/5 hover:text-white"
         >
           <IconWrapper>
