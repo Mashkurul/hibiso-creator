@@ -48,6 +48,21 @@ const navItems: NavItem[] = [
     ),
   },
   {
+    label: "Campaign Offers",
+    href: "/campaign-offers",
+    icon: (
+      <IconWrapper>
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+          <path
+            d="M5 7.5A2.5 2.5 0 017.5 5H11l2 2h3.5A2.5 2.5 0 0119 9.5v7a2.5 2.5 0 01-2.5 2.5h-9A2.5 2.5 0 015 16.5v-9z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+        </svg>
+      </IconWrapper>
+    ),
+  },
+  {
     label: "My Projects",
     href: "/my-projects",
     icon: (

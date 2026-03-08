@@ -255,6 +255,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
           </label>
         </div>
       )}
+
     </header>
   );
 }

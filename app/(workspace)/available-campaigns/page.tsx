@@ -10,7 +10,8 @@ type Campaign = {
   budget: string;
   platform: string;
   category: string;
-  dueIn: string;
+  startDate: string;
+  endDate: string;
   location: string;
   image: string;
 };
@@ -23,7 +24,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC450",
     platform: "Instagram",
     category: "Beauty",
-    dueIn: "3 days",
+    startDate: "Mar 10, 2026",
+    endDate: "Mar 12, 2026",
     location: "Bali, Indonesia",
     image:
       "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80",
@@ -35,7 +37,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC680",
     platform: "Instagram",
     category: "Travel",
-    dueIn: "5 days",
+    startDate: "Mar 11, 2026",
+    endDate: "Mar 14, 2026",
     location: "Santorini, Greece",
     image:
       "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80",
@@ -47,7 +50,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC520",
     platform: "YouTube",
     category: "Hospitality",
-    dueIn: "7 days",
+    startDate: "Mar 12, 2026",
+    endDate: "Mar 16, 2026",
     location: "Tulum, Mexico",
     image:
       "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1200&q=80",
@@ -59,7 +63,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC310",
     platform: "TikTok",
     category: "Food",
-    dueIn: "2 days",
+    startDate: "Mar 09, 2026",
+    endDate: "Mar 11, 2026",
     location: "Milan, Italy",
     image:
       "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
@@ -71,7 +76,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC540",
     platform: "Instagram",
     category: "Fitness",
-    dueIn: "6 days",
+    startDate: "Mar 10, 2026",
+    endDate: "Mar 15, 2026",
     location: "Lisbon, Portugal",
     image:
       "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
@@ -83,7 +89,8 @@ const campaigns: Campaign[] = [
     budget: "\u20AC760",
     platform: "YouTube",
     category: "Tech",
-    dueIn: "8 days",
+    startDate: "Mar 13, 2026",
+    endDate: "Mar 17, 2026",
     location: "Berlin, Germany",
     image:
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
@@ -161,8 +168,10 @@ export default function AvailableCampaignsPage() {
             <p className="mt-1 text-xl font-semibold text-[#2f3747]">{selectedCampaign.category}</p>
           </div>
           <div className="rounded-2xl bg-[#f8fafc] p-4">
-            <p className="text-xs text-[#8b97ab]">Deadline</p>
-            <p className="mt-1 text-xl font-semibold text-[#2f3747]">{selectedCampaign.dueIn}</p>
+            <p className="text-xs text-[#8b97ab]">Campaign Dates</p>
+            <p className="mt-1 text-xl font-semibold text-[#2f3747]">
+              {selectedCampaign.startDate} - {selectedCampaign.endDate}
+            </p>
           </div>
         </div>
 
@@ -356,7 +365,7 @@ export default function AvailableCampaignsPage() {
                   <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M12 8v4l2.5 1.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
-                {campaign.dueIn}
+                {campaign.startDate} - {campaign.endDate}
               </span>
             </div>
 
