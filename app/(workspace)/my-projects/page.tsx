@@ -3,194 +3,10 @@
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useState } from "react";
-
-type ProjectStatus = "In Progress" | "Under Review" | "Waiting Assets" | "Completed";
-
-type ManagedProject = {
-  id: number;
-  title: string;
-  brand: string;
-  status: ProjectStatus;
-  due: string;
-  payout: string;
-  manager: string;
-  brief: string;
-  requiredPhotos: number;
-  uploadedPhotos: number;
-  requiredVideos: number;
-  uploadedVideos: number;
-  requiredStories: number;
-  uploadedStories: number;
-  hashtagList: string[];
-  checklist: string[];
-};
-
-type ProjectSummary = {
-  id: number;
-  title: string;
-  brand: string;
-  status: ProjectStatus;
-  due: string;
-  payout: string;
-};
-
-type AppliedProject = {
-  id: number;
-  campaign: string;
-  brand: string;
-  appliedOn: string;
-  stage: "Applied" | "Shortlisted" | "Rejected";
-  budget: string;
-};
-
-type BrandInvite = {
-  id: number;
-  brand: string;
-  campaign: string;
-  invitedOn: string;
-  responseBy: string;
-  budget: string;
-};
-
-const activeProjects: ManagedProject[] = [
-  {
-    id: 1,
-    title: "Summer Collection Launch",
-    brand: "GlowCo",
-    status: "In Progress",
-    due: "Mar 09, 2026",
-    payout: "\u20AC450",
-    manager: "Mia Carter",
-    brief:
-      "Produce bright, creator-led content for GlowCo summer products. Focus on natural light and first 3-second product visibility.",
-    requiredPhotos: 8,
-    uploadedPhotos: 5,
-    requiredVideos: 2,
-    uploadedVideos: 1,
-    requiredStories: 4,
-    uploadedStories: 3,
-    hashtagList: ["#GlowCoSummer", "#SkincareRoutine", "#Ad"],
-    checklist: [
-      "Submit first cut for approval",
-      "Include product close-up shot",
-      "Add CTA in final frame",
-      "Upload caption draft",
-    ],
-  },
-  {
-    id: 2,
-    title: "Resort Walkthrough Reel",
-    brand: "EcoStay",
-    status: "Under Review",
-    due: "Mar 05, 2026",
-    payout: "\u20AC520",
-    manager: "Noah Greene",
-    brief:
-      "Create a cinematic walkthrough reel showing room, pool, and sunrise experience. Keep tone premium and calm.",
-    requiredPhotos: 6,
-    uploadedPhotos: 6,
-    requiredVideos: 1,
-    uploadedVideos: 1,
-    requiredStories: 3,
-    uploadedStories: 2,
-    hashtagList: ["#EcoStay", "#TravelCreator", "#PaidPartnership"],
-    checklist: [
-      "Brand legal review pending",
-      "Confirm music licensing",
-      "Add location tag",
-      "Deliver final SRT subtitles",
-    ],
-  },
-  {
-    id: 3,
-    title: "Coffee Bar Lifestyle Post",
-    brand: "Brewline",
-    status: "Waiting Assets",
-    due: "Mar 12, 2026",
-    payout: "\u20AC310",
-    manager: "Lena Park",
-    brief:
-      "Shoot cozy coffee-bar lifestyle photos and a short vertical clip highlighting morning routine and product placement.",
-    requiredPhotos: 10,
-    uploadedPhotos: 2,
-    requiredVideos: 1,
-    uploadedVideos: 0,
-    requiredStories: 2,
-    uploadedStories: 0,
-    hashtagList: ["#BrewlineMoments", "#CoffeeLovers", "#Collab"],
-    checklist: [
-      "Receive product shipment",
-      "Finalize shot list with brand",
-      "Capture before/after sequence",
-      "Submit draft cover frame",
-    ],
-  },
-];
-
-const completedProjects: ProjectSummary[] = [
-  {
-    id: 10,
-    title: "Travel Vlog Mini Series",
-    brand: "Wanderlust",
-    status: "Completed",
-    due: "Feb 18, 2026",
-    payout: "\u20AC700",
-  },
-  {
-    id: 11,
-    title: "At-Home Workout Stories",
-    brand: "FitNest",
-    status: "Completed",
-    due: "Feb 02, 2026",
-    payout: "\u20AC540",
-  },
-];
-
-const appliedProjects: AppliedProject[] = [
-  {
-    id: 20,
-    campaign: "Creator Desk Setup Demo",
-    brand: "TechFold",
-    appliedOn: "Mar 01, 2026",
-    stage: "Shortlisted",
-    budget: "\u20AC760",
-  },
-  {
-    id: 21,
-    campaign: "Luxury Stay Story Set",
-    brand: "Luxe Travel",
-    appliedOn: "Feb 28, 2026",
-    stage: "Applied",
-    budget: "\u20AC680",
-  },
-  {
-    id: 22,
-    campaign: "City Weekend UGC Pack",
-    brand: "UrbanNest",
-    appliedOn: "Feb 24, 2026",
-    stage: "Rejected",
-    budget: "\u20AC390",
-  },
-];
-
-const brandInvites: BrandInvite[] = [
-  {
-    id: 30,
-    brand: "SolarSip",
-    campaign: "Hydration Habit Challenge",
-    invitedOn: "Mar 02, 2026",
-    responseBy: "Mar 05, 2026",
-    budget: "\u20AC480",
-  },
-  {
-    id: 31,
-    brand: "Bloom Skin",
-    campaign: "Night Repair Testimonial Reel",
-    invitedOn: "Mar 01, 2026",
-    responseBy: "Mar 04, 2026",
-    budget: "\u20AC530",
-  },
-];
+import { appliedCampaigns } from "@/app/lib/applied-campaigns";
+import { brandInvites } from "@/app/lib/brand-invites";
+import { completedCampaigns } from "@/app/lib/completed-campaigns";
+import { activeProjects, type ManagedProject } from "@/app/lib/managed-projects";
 
 function StatusPill({ value }: { value: string }) {
   const styles: Record<string, string> = {
@@ -199,7 +15,7 @@ function StatusPill({ value }: { value: string }) {
     "Waiting Assets": "bg-[#f4ecff] text-[#7a57b8]",
     Completed: "bg-[#e8f7ee] text-[#3d9a61]",
     Applied: "bg-[#eaf1ff] text-[#4f6fd3]",
-    Shortlisted: "bg-[#e6f8ef] text-[#2f8a5a]",
+    Accepted: "bg-[#e6f8ef] text-[#2f8a5a]",
     Rejected: "bg-[#fdecef] text-[#c04963]",
   };
 
@@ -386,16 +202,20 @@ export default function MyProjectsPage() {
       <section className="reveal-enter">
         <h1 className="text-3xl font-semibold text-[#2f3747]">My Projects</h1>
         <p className="mt-1 text-sm text-[#7c879b]">
-          Manage active deliveries, review finished work, track applied campaigns, and respond to invites.
+          Manage active deliveries, track campaign applications, review outcomes, and respond to invites.
         </p>
       </section>
 
       <section className="reveal-enter grid gap-4 sm:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: "80ms" }}>
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
+        <Link
+          href="/my-projects/current-campaigns"
+          className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)] transition hover:bg-[#f7fbff]"
+        >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Current Projects</p>
               <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{activeProjects.length}</p>
+              <p className="mt-2 text-xs text-[#8d98ad]">Manage live work</p>
             </div>
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#eef3ff] text-[#5a74c6]">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
@@ -404,12 +224,16 @@ export default function MyProjectsPage() {
               </svg>
             </span>
           </div>
-        </article>
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
+        </Link>
+        <Link
+          href="/my-projects/finished-campaigns"
+          className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)] transition hover:bg-[#f7fbff]"
+        >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Finished Projects</p>
-              <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{completedProjects.length}</p>
+              <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{completedCampaigns.length}</p>
+              <p className="mt-2 text-xs text-[#8d98ad]">Review delivered work</p>
             </div>
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#eaf8f1] text-[#4f9a72]">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
@@ -418,12 +242,16 @@ export default function MyProjectsPage() {
               </svg>
             </span>
           </div>
-        </article>
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
+        </Link>
+        <Link
+          href="/my-projects/applied-campaigns"
+          className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)] transition hover:bg-[#fffaf4]"
+        >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Applied Campaigns</p>
-              <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{appliedProjects.length}</p>
+              <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{appliedCampaigns.length}</p>
+              <p className="mt-2 text-xs text-[#8d98ad]">Open full application details</p>
             </div>
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#fff0e4] text-[#df8b37]">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
@@ -431,12 +259,16 @@ export default function MyProjectsPage() {
               </svg>
             </span>
           </div>
-        </article>
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
+        </Link>
+        <Link
+          href="/my-projects/brand-invites"
+          className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)] transition hover:bg-[#fff8fa]"
+        >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Brand Invites</p>
               <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{brandInvites.length}</p>
+              <p className="mt-2 text-xs text-[#8d98ad]">See open invite sources</p>
             </div>
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#fdecef] text-[#d65778]">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
@@ -445,7 +277,7 @@ export default function MyProjectsPage() {
               </svg>
             </span>
           </div>
-        </article>
+        </Link>
       </section>
 
       <section className="reveal-enter hover-lift rounded-3xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]" style={{ animationDelay: "140ms" }}>
@@ -470,19 +302,25 @@ export default function MyProjectsPage() {
             <tbody>
               {activeProjects.map((project) => (
                 <tr key={project.id} className="bg-white text-sm text-[#3e4a60] transition hover:bg-[#f8fbff]">
-                  <td className="rounded-l-xl px-3 py-3">{project.title}</td>
+                  <td className="rounded-l-xl px-3 py-3">
+                    <Link
+                      href={`/my-projects/current-campaigns?project=${project.id}`}
+                      className="font-medium text-[#2f3747] transition hover:text-[#4f6fd3]"
+                    >
+                      {project.title}
+                    </Link>
+                  </td>
                   <td className="px-3 py-3">{project.brand}</td>
                   <td className="px-3 py-3"><StatusPill value={project.status} /></td>
                   <td className="px-3 py-3 text-[#8894a8]">{project.due}</td>
                   <td className="px-3 py-3 font-semibold text-[#2f3747]">{project.payout}</td>
                   <td className="rounded-r-xl px-3 py-3">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProject(project)}
+                    <Link
+                      href={`/my-projects/current-campaigns?project=${project.id}`}
                       className="tap-press rounded-lg border border-[#dde3f0] bg-white px-3 py-1.5 text-xs font-medium text-[#4c5b76] transition hover:bg-[#f2f5fb]"
                     >
                       View Details
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -495,40 +333,60 @@ export default function MyProjectsPage() {
         <article className="reveal-enter hover-lift rounded-3xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]" style={{ animationDelay: "240ms" }}>
           <h2 className="text-xl font-semibold text-[#2f3747]">Finished Projects</h2>
           <ul className="mt-4 space-y-3">
-            {completedProjects.map((project) => (
-              <li key={project.id} className="hover-lift rounded-2xl bg-white p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-[#2f3747]">{project.title}</p>
-                    <p className="mt-1 text-xs text-[#8b97ab]">{project.brand} . Finished {project.due}</p>
+            {completedCampaigns.map((project) => (
+              <li key={project.id}>
+                <Link
+                  href={`/my-projects/finished-campaigns?campaign=${project.id}`}
+                  className="hover-lift block rounded-2xl bg-white p-3 transition hover:bg-[#f8fbff]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#2f3747] transition hover:text-[#4f6fd3]">
+                        {project.title}
+                      </p>
+                      <p className="mt-1 text-xs text-[#8b97ab]">{project.brand} . Finished {project.due}</p>
+                    </div>
+                    <div className="text-right">
+                      <StatusPill value={project.status} />
+                      <p className="mt-2 text-sm font-semibold text-[#2f3747]">{project.payout}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <StatusPill value={project.status} />
-                    <p className="mt-2 text-sm font-semibold text-[#2f3747]">{project.payout}</p>
-                  </div>
-                </div>
+                </Link>
               </li>
             ))}
           </ul>
         </article>
 
         <article className="reveal-enter hover-lift rounded-3xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]" style={{ animationDelay: "280ms" }}>
-          <h2 className="text-xl font-semibold text-[#2f3747]">Applied Projects</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-[#2f3747]">My Campaign Applications</h2>
+            <p className="text-xs uppercase tracking-[0.08em] text-[#8b97ab]">
+              Applied, accepted, rejected, completed
+            </p>
+          </div>
           <ul className="mt-4 space-y-3">
-            {appliedProjects.map((project) => (
-              <li key={project.id} className="hover-lift rounded-2xl bg-white p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-[#2f3747]">{project.campaign}</p>
-                    <p className="mt-1 text-xs text-[#8b97ab]">
-                      {project.brand} . Applied {project.appliedOn}
-                    </p>
+            {appliedCampaigns.map((project) => (
+              <li key={project.id}>
+                <Link
+                  href={`/my-projects/applied-campaigns?campaign=${project.id}`}
+                  className="hover-lift block rounded-2xl bg-white p-3 transition hover:bg-[#fffaf4]"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#2f3747] transition hover:text-[#4f6fd3]">
+                        {project.campaign}
+                      </p>
+                      <p className="mt-1 text-xs text-[#8b97ab]">
+                        {project.brand} . Applied {project.appliedOn}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-[#68748a]">{project.updateNote}</p>
+                    </div>
+                    <div className="text-right">
+                      <StatusPill value={project.stage} />
+                      <p className="mt-2 text-sm font-semibold text-[#2f3747]">{project.budget}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <StatusPill value={project.stage} />
-                    <p className="mt-2 text-sm font-semibold text-[#2f3747]">{project.budget}</p>
-                  </div>
-                </div>
+                </Link>
               </li>
             ))}
           </ul>
@@ -544,23 +402,29 @@ export default function MyProjectsPage() {
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           {brandInvites.map((invite) => (
-            <article key={invite.id} className="hover-lift rounded-2xl bg-white p-4">
+            <Link
+              key={invite.id}
+              href={`/my-projects/brand-invites?invite=${invite.id}`}
+              className="hover-lift block rounded-2xl bg-white p-4 transition hover:bg-[#fff8fa]"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#8b97ab]">{invite.brand}</p>
-              <h3 className="mt-1 text-base font-semibold text-[#2f3747]">{invite.campaign}</h3>
+              <p className="mt-1 block text-base font-semibold text-[#2f3747] transition hover:text-[#4f6fd3]">
+                {invite.campaign}
+              </p>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#7c879b]">
                 <p>Invited: {invite.invitedOn}</p>
                 <p>Respond by: {invite.responseBy}</p>
               </div>
               <p className="mt-2 text-sm font-semibold text-[#2f3747]">Budget: {invite.budget}</p>
               <div className="mt-3 flex gap-2">
-                <button className="tap-press rounded-xl bg-gradient-to-r from-[#de8b34] to-[#e36d58] px-3 py-2 text-xs font-semibold text-white">
+                <span className="tap-press rounded-xl bg-gradient-to-r from-[#de8b34] to-[#e36d58] px-3 py-2 text-xs font-semibold text-white">
                   Accept Invite
-                </button>
-                <button className="tap-press rounded-xl border border-[#dde3f0] bg-white px-3 py-2 text-xs font-medium text-[#4c5b76]">
+                </span>
+                <span className="tap-press rounded-xl border border-[#dde3f0] bg-white px-3 py-2 text-xs font-medium text-[#4c5b76]">
                   Decline
-                </button>
+                </span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>

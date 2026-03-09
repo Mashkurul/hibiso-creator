@@ -146,11 +146,12 @@ export default function SideNav({ mobileOpen, onClose }: SideNavProps) {
 
   return (
     <aside
-      className={`nav-enter fixed inset-y-0 left-0 z-50 flex h-screen w-[264px] min-w-[264px] flex-col border-r border-white/10 bg-[#2a2725] text-[#b7b4bf] transition-transform duration-300 md:fixed md:left-0 md:top-0 md:z-20 md:translate-x-0 md:overflow-hidden ${
+      className={`nav-enter fixed inset-y-0 left-0 z-50 flex h-screen w-[264px] min-w-[264px] flex-col border-r border-white/10 bg-[linear-gradient(180deg,#25211f_0%,#201d1c_100%)] text-[#b7b4bf] shadow-[18px_0_50px_rgba(15,23,42,0.22)] transition-transform duration-300 md:fixed md:left-0 md:top-0 md:z-20 md:translate-x-0 md:overflow-hidden ${
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       <div className="px-5 pb-7 pt-6">
+        <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(247,163,52,0.16),transparent_58%)]" />
         <button
           type="button"
           aria-label="Close menu"
@@ -161,7 +162,7 @@ export default function SideNav({ mobileOpen, onClose }: SideNavProps) {
             <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
         </button>
-        <div className="mb-8">
+        <div className="relative mb-8">
           <Image
             src="/hibiso_logo.svg"
             alt="Hibis'o logo"
@@ -172,14 +173,14 @@ export default function SideNav({ mobileOpen, onClose }: SideNavProps) {
           />
         </div>
 
-        <div className="mb-5">
+        <div className="relative mb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#6f7488]">
             Creator Workspace
           </p>
           <div className="mt-2 h-px w-full bg-white/10" />
         </div>
 
-        <nav className="space-y-2">
+        <nav className="relative space-y-2">
           {navItems.map((item) => {
             const active = pathname === item.href;
 
@@ -190,7 +191,7 @@ export default function SideNav({ mobileOpen, onClose }: SideNavProps) {
                 onClick={onClose}
                 className={`tap-press flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   active
-                    ? "bg-gradient-to-r from-[#f7a334] to-[#ee6a53] text-white"
+                    ? "bg-gradient-to-r from-[#f7a334] to-[#ee6a53] text-white shadow-[0_14px_30px_rgba(238,106,83,0.22)]"
                     : "hover:bg-white/5 hover:pl-5 hover:text-white"
                 }`}
               >

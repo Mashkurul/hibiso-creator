@@ -240,7 +240,7 @@ export default function ContractsPage() {
         </p>
       </section>
 
-      <section className="reveal-enter grid gap-4 sm:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: "80ms" }}>
+      <section className="reveal-enter hidden gap-4 sm:grid sm:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: "80ms" }}>
         <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Pending Signature</p>
           <p className="mt-2 text-[28px] font-semibold leading-none text-[#2f3747]">{stats.pending}</p>

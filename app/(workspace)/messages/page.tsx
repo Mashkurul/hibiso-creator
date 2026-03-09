@@ -84,6 +84,7 @@ export default function MessagesPage() {
   const [threads, setThreads] = useState(initialThreads);
   const [activeThreadId, setActiveThreadId] = useState(initialThreads[0].id);
   const [text, setText] = useState("");
+  const [mobileView, setMobileView] = useState<"list" | "chat">("list");
 
   const activeThread = useMemo(
     () => threads.find((item) => item.id === activeThreadId) ?? threads[0],
@@ -92,6 +93,7 @@ export default function MessagesPage() {
 
   const openThread = (id: number) => {
     setActiveThreadId(id);
+    setMobileView("chat");
     setThreads((current) => current.map((t) => (t.id === id ? { ...t, unread: 0 } : t)));
   };
 
@@ -132,63 +134,96 @@ export default function MessagesPage() {
 
       <section className="reveal-enter hover-lift overflow-hidden rounded-3xl border border-[#e6e1d9] bg-[#f7f5f0] shadow-[0_4px_14px_rgba(20,30,60,0.06)]" style={{ animationDelay: "100ms" }}>
         <div className="grid min-h-[620px] grid-cols-1 md:min-h-[760px] md:grid-cols-[280px_1fr]">
-          <aside className="reveal-enter border-b border-[#e7e2d8] p-3 md:border-b-0 md:border-r" style={{ animationDelay: "160ms" }}>
-            <input
-              placeholder="Search creator, group, campaign..."
-              className="w-full rounded-xl border border-[#d8d2c7] bg-[#f9f7f2] px-3 py-2 text-sm text-[#3b495f] outline-none focus:border-[#c7bfb1]"
-            />
-            <button className="tap-press mt-2 w-full rounded-xl border border-[#d8d2c7] bg-[#f9f7f2] py-2 text-sm font-semibold text-[#4f5c72] transition hover:bg-[#f0ece4]">
-              New Group
-            </button>
+          <aside
+            className={`reveal-enter border-b border-[#e7e2d8] p-3 md:block md:border-b-0 md:border-r ${
+              mobileView === "chat" ? "hidden" : "block"
+            }`}
+            style={{ animationDelay: "160ms" }}
+          >
+            <div className="rounded-[28px] bg-[linear-gradient(135deg,#fff4e7_0%,#f7f5f0_55%,#f1f5ff_100%)] p-3">
+              <input
+                placeholder="Search creator, group, campaign..."
+                className="w-full rounded-2xl border border-[#d8d2c7] bg-white px-4 py-3 text-sm text-[#3b495f] outline-none focus:border-[#c7bfb1]"
+              />
+              <button className="tap-press mt-3 w-full rounded-2xl bg-gradient-to-r from-[#de8b34] to-[#e36d58] py-3 text-sm font-semibold text-white transition hover:brightness-105">
+                New Group
+              </button>
+            </div>
 
             <div className="mt-3 space-y-2">
               {threads.map((thread) => {
                 const active = thread.id === activeThreadId;
+                const lastMessage = thread.messages[thread.messages.length - 1];
+
                 return (
                   <button
                     key={thread.id}
                     type="button"
                     onClick={() => openThread(thread.id)}
-                    className={`tap-press hover-lift w-full rounded-xl border px-2.5 py-2 text-left transition ${
+                    className={`tap-press w-full rounded-[24px] border px-3 py-3 text-left transition ${
                       active
                         ? "border-[#d8c8ad] bg-[#efe7d8]"
-                        : "border-transparent hover:border-[#ded8cd] hover:bg-[#f4f0e8]"
+                        : "border-transparent bg-white hover:border-[#ded8cd] hover:bg-[#f4f0e8]"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-start gap-2.5">
-                        <div
-                          className="h-10 w-10 rounded-full bg-cover bg-center"
-                          style={{ backgroundImage: `url('${thread.avatar}')` }}
-                          role="img"
-                          aria-label={thread.name}
-                        />
-                        <div>
-                          <p className="text-[18px] font-semibold leading-none text-[#1f2c44]">{thread.name}</p>
-                          <p className="mt-1 text-[11px] text-[#7b879b]">{thread.campaign}</p>
-                          {thread.isGroup && (
-                            <span className="mt-1 inline-block rounded-full bg-[#e8eefb] px-2 py-0.5 text-[9px] font-semibold text-[#4d6cb8]">
-                              GROUP
-                            </span>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <div className="relative">
+                          <div
+                            className="h-12 w-12 rounded-full bg-cover bg-center"
+                            style={{ backgroundImage: `url('${thread.avatar}')` }}
+                            role="img"
+                            aria-label={thread.name}
+                          />
+                          {thread.online && (
+                            <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#30a46c]" />
                           )}
                         </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate text-base font-semibold leading-none text-[#1f2c44]">{thread.name}</p>
+                            {thread.isGroup && (
+                              <span className="rounded-full bg-[#e8eefb] px-2 py-0.5 text-[9px] font-semibold text-[#4d6cb8]">
+                                GROUP
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 truncate text-[11px] text-[#7b879b]">{thread.campaign}</p>
+                          <p className="mt-2 truncate text-xs text-[#5b687f]">{lastMessage?.text}</p>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-[#8d98ad]">{thread.lastSeen}</p>
+                      <div className="shrink-0 text-right">
+                        <p className="text-[11px] text-[#8d98ad]">{thread.lastSeen}</p>
+                        {thread.unread > 0 && (
+                          <span className="mt-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#de8b34] px-1 text-[10px] font-semibold text-white">
+                            {thread.unread}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    {thread.unread > 0 && (
-                      <span className="mt-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#de8b34] px-1 text-[10px] font-semibold text-white">
-                        {thread.unread}
-                      </span>
-                    )}
                   </button>
                 );
               })}
             </div>
           </aside>
 
-          <article className="reveal-enter flex min-h-0 flex-col" style={{ animationDelay: "220ms" }}>
-            <header className="reveal-enter flex items-center justify-between border-b border-[#e7e2d8] px-4 py-2.5" style={{ animationDelay: "260ms" }}>
+          <article
+            className={`reveal-enter min-h-0 flex-col md:flex ${
+              mobileView === "chat" ? "flex" : "hidden md:flex"
+            }`}
+            style={{ animationDelay: "220ms" }}
+          >
+            <header className="reveal-enter flex items-center justify-between border-b border-[#e7e2d8] px-4 py-3" style={{ animationDelay: "260ms" }}>
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMobileView("list")}
+                  className="tap-press inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#4d5f7a] transition hover:bg-[#eceef4] md:hidden"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                    <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
                 <div
                   className="h-11 w-11 rounded-full bg-cover bg-center"
                   style={{ backgroundImage: `url('${activeThread.avatar}')` }}
@@ -209,16 +244,16 @@ export default function MessagesPage() {
               </div>
             </header>
 
-            <div className="reveal-enter flex-1 space-y-2 overflow-y-auto px-4 py-3" style={{ animationDelay: "300ms" }}>
+            <div className="reveal-enter flex-1 space-y-2 overflow-y-auto bg-[linear-gradient(180deg,#f9f6ef_0%,#f4f0e8_100%)] px-3 py-3 sm:px-4" style={{ animationDelay: "300ms" }}>
               {activeThread.messages.map((message) => {
                 const mine = message.sender === "You";
                 return (
                   <div key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[86%] rounded-2xl border px-3 py-2 text-sm sm:max-w-[72%] lg:max-w-[58%] ${
+                      className={`max-w-[88%] rounded-[22px] border px-3 py-2.5 text-sm shadow-[0_6px_18px_rgba(20,30,60,0.05)] sm:max-w-[72%] lg:max-w-[58%] ${
                         mine
-                          ? "border-[#d8813f] bg-[#de8b34] text-white"
-                          : "border-[#d7d2c9] bg-[#f8f6f1] text-[#2f3a50]"
+                          ? "border-[#d8813f] bg-gradient-to-r from-[#de8b34] to-[#e36d58] text-white"
+                          : "border-[#e7dfd2] bg-[#fffdf9] text-[#2f3a50]"
                       } pop-enter`}
                     >
                       <p>{message.text}</p>
@@ -232,7 +267,7 @@ export default function MessagesPage() {
             </div>
 
             <footer className="reveal-enter border-t border-[#e7e2d8] bg-[#f3f0e8] p-3" style={{ animationDelay: "340ms" }}>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 rounded-[24px] bg-white p-2 shadow-[0_8px_20px_rgba(20,30,60,0.06)]">
                 <input
                   value={text}
                   onChange={(event) => setText(event.target.value)}
@@ -242,12 +277,12 @@ export default function MessagesPage() {
                     }
                   }}
                   placeholder="Write a message..."
-                  className="w-full rounded-xl border border-[#d6d0c3] bg-[#f8f6f1] px-3 py-2 text-sm text-[#3c4a60] outline-none focus:border-[#c7bfae]"
+                  className="w-full rounded-2xl border border-[#ede6d9] bg-[#f8f6f1] px-4 py-3 text-sm text-[#3c4a60] outline-none focus:border-[#c7bfae]"
                 />
                 <button
                   type="button"
                   onClick={sendMessage}
-                  className="tap-press rounded-xl bg-[#de8b34] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105"
+                  className="tap-press rounded-2xl bg-gradient-to-r from-[#de8b34] to-[#e36d58] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105"
                 >
                   Send
                 </button>

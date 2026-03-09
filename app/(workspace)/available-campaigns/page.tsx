@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Campaign = {
   id: number;
@@ -48,7 +48,7 @@ const campaigns: Campaign[] = [
     brand: "EcoStay",
     title: "Resort Walkthrough Video",
     budget: "\u20AC520",
-    platform: "YouTube",
+    platform: "UGC Ads",
     category: "Hospitality",
     startDate: "Mar 12, 2026",
     endDate: "Mar 16, 2026",
@@ -97,15 +97,99 @@ const campaigns: Campaign[] = [
   },
 ];
 
+const platformOptions = ["All Platforms", "Instagram", "TikTok", "UGC Ads", "YouTube"];
+const categoryOptions = [
+  "All Categories",
+  "Beauty",
+  "Travel",
+  "Hospitality",
+  "Food",
+  "Fitness",
+  "Tech",
+];
+const budgetOptions = [
+  "All Budgets",
+  "Under \u20AC400",
+  "\u20AC400-\u20AC599",
+  "\u20AC600+",
+];
+const deadlineOptions = [
+  "Any Deadline",
+  "This Week",
+  "Next 7 Days",
+  "Next 14 Days",
+];
+
+function parseBudgetValue(value: string) {
+  return Number(value.replace(/[^\d]/g, ""));
+}
+
+function parseCampaignDate(value: string) {
+  return new Date(`${value} 00:00:00`);
+}
+
 export default function AvailableCampaignsPage() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [appliedCampaignIds, setAppliedCampaignIds] = useState<number[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState("All Platforms");
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedBudgetRange, setSelectedBudgetRange] = useState("All Budgets");
+  const [selectedDeadlineRange, setSelectedDeadlineRange] = useState("Any Deadline");
 
   const handleApply = (campaignId: number) => {
     setAppliedCampaignIds((current) =>
       current.includes(campaignId) ? current : [...current, campaignId]
     );
   };
+
+  const filteredCampaigns = useMemo(() => {
+    const today = new Date("2026-03-10T00:00:00");
+
+    return campaigns.filter((campaign) => {
+      const normalizedQuery = searchQuery.trim().toLowerCase();
+      const budgetValue = parseBudgetValue(campaign.budget);
+      const deadlineDate = parseCampaignDate(campaign.endDate);
+      const deadlineDelta =
+        Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        `${campaign.brand} ${campaign.title} ${campaign.location}`
+          .toLowerCase()
+          .includes(normalizedQuery);
+      const matchesPlatform =
+        selectedPlatform === "All Platforms" || campaign.platform === selectedPlatform;
+      const matchesCategory =
+        selectedCategory === "All Categories" || campaign.category === selectedCategory;
+      const matchesBudget =
+        selectedBudgetRange === "All Budgets" ||
+        (selectedBudgetRange === "Under \u20AC400" && budgetValue < 400) ||
+        (selectedBudgetRange === "\u20AC400-\u20AC599" &&
+          budgetValue >= 400 &&
+          budgetValue <= 599) ||
+        (selectedBudgetRange === "\u20AC600+" && budgetValue >= 600);
+      const matchesDeadline =
+        selectedDeadlineRange === "Any Deadline" ||
+        (selectedDeadlineRange === "This Week" && deadlineDelta >= 0 && deadlineDelta <= 7) ||
+        (selectedDeadlineRange === "Next 7 Days" && deadlineDelta >= 0 && deadlineDelta <= 7) ||
+        (selectedDeadlineRange === "Next 14 Days" && deadlineDelta >= 0 && deadlineDelta <= 14);
+
+      return (
+        matchesQuery &&
+        matchesPlatform &&
+        matchesCategory &&
+        matchesBudget &&
+        matchesDeadline
+      );
+    });
+  }, [
+    searchQuery,
+    selectedPlatform,
+    selectedCategory,
+    selectedBudgetRange,
+    selectedDeadlineRange,
+  ]);
 
   useEffect(() => {
     if (!selectedCampaign) {
@@ -226,7 +310,7 @@ export default function AvailableCampaignsPage() {
         </p>
       </section>
 
-      <section className="reveal-enter grid gap-4 sm:grid-cols-2 lg:grid-cols-4" style={{ animationDelay: "80ms" }}>
+      <section className="reveal-enter hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4" style={{ animationDelay: "80ms" }}>
         <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
           <div className="flex items-start justify-between">
             <div>
@@ -300,34 +384,66 @@ export default function AvailableCampaignsPage() {
             </svg>
             <input
               type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search by brand or campaign"
               className="w-full rounded-xl bg-white py-2.5 pl-10 pr-4 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1] focus:ring-[#b7c5df]"
             />
           </div>
-          <select className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]">
-            <option>All Platforms</option>
-            <option>Instagram</option>
-            <option>YouTube</option>
-            <option>TikTok</option>
+          <select
+            value={selectedPlatform}
+            onChange={(event) => setSelectedPlatform(event.target.value)}
+            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
+          >
+            {platformOptions.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
           </select>
-          <select className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]">
-            <option>All Categories</option>
-            <option>Travel</option>
-            <option>Beauty</option>
-            <option>Tech</option>
-            <option>Fitness</option>
+          <select
+            value={selectedCategory}
+            onChange={(event) => setSelectedCategory(event.target.value)}
+            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
+          >
+            {categoryOptions.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
           </select>
-          <button className="tap-press inline-flex items-center gap-2 rounded-xl bg-[#2f3747] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#252c39]">
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-              <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-            Filter
+          <select
+            value={selectedBudgetRange}
+            onChange={(event) => setSelectedBudgetRange(event.target.value)}
+            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
+          >
+            {budgetOptions.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+          <select
+            value={selectedDeadlineRange}
+            onChange={(event) => setSelectedDeadlineRange(event.target.value)}
+            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
+          >
+            {deadlineOptions.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedPlatform("All Platforms");
+              setSelectedCategory("All Categories");
+              setSelectedBudgetRange("All Budgets");
+              setSelectedDeadlineRange("Any Deadline");
+            }}
+            className="tap-press inline-flex items-center gap-2 rounded-xl bg-[#2f3747] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#252c39]"
+          >
+            Reset
           </button>
         </div>
       </section>
 
       <section className="reveal-enter grid gap-4 md:grid-cols-2 xl:grid-cols-3" style={{ animationDelay: "220ms" }}>
-        {campaigns.map((campaign) => (
+        {filteredCampaigns.map((campaign) => (
           <article
             key={campaign.id}
             className="hover-lift rounded-3xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
@@ -418,6 +534,15 @@ export default function AvailableCampaignsPage() {
             </div>
           </article>
         ))}
+
+        {filteredCampaigns.length === 0 && (
+          <article className="md:col-span-2 xl:col-span-3 rounded-3xl bg-white p-8 text-center shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+            <h2 className="text-xl font-semibold text-[#2f3747]">No campaigns match these filters</h2>
+            <p className="mt-2 text-sm text-[#7c879b]">
+              Adjust budget, category, platform, or deadline to widen the campaign list.
+            </p>
+          </article>
+        )}
       </section>
 
       {campaignModal && createPortal(campaignModal, document.body)}

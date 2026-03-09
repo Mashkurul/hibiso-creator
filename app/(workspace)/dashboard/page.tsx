@@ -19,43 +19,51 @@ type CampaignCard = {
 
 const statCards: StatCard[] = [
   {
-    label: "Available Campaigns",
-    value: "12",
+    label: "Active Campaigns",
+    value: "4",
     icon: "gift",
     iconBg: "bg-[#f8efe2]",
     iconColor: "text-[#de8f35]",
-    href: "/available-campaigns",
+    href: "/my-projects/current-campaigns",
   },
   {
-    label: "Active Projects",
-    value: "3",
+    label: "Completed Campaigns",
+    value: "12",
     icon: "clock",
     iconBg: "bg-[#edf1e8]",
     iconColor: "text-[#8da26f]",
-    href: "/my-projects",
+    href: "/my-projects/finished-campaigns",
   },
   {
-    label: "Total Earnings",
-    value: "€ 4,250",
-    icon: "euro",
-    iconBg: "bg-[#f8e9ef]",
-    iconColor: "text-[#e16388]",
-    href: "/earnings",
-  },
-  {
-    label: "Pending Payments",
-    value: "€850",
+    label: "Pending Approvals",
+    value: "3",
     icon: "check",
     iconBg: "bg-[#faeee8]",
     iconColor: "text-[#ea7e5c]",
-    href: "/pending-payments",
+    href: "/my-projects/current-campaigns",
+  },
+  {
+    label: "Total Earnings",
+    value: "\u20AC 4,250",
+    icon: "euro",
+    iconBg: "bg-[#f8e9ef]",
+    iconColor: "text-[#e16388]",
+    href: "/earnings/transactions",
+  },
+  {
+    label: "Response Rate",
+    value: "92%",
+    icon: "message",
+    iconBg: "bg-[#eef3ff]",
+    iconColor: "text-[#5674ca]",
+    href: "/messages",
   },
 ];
 
 const campaignCards: CampaignCard[] = [
   {
     title: "GlowCo Skincare",
-    price: "€450",
+    price: "\u20AC450",
     description: "Capture the morning sun with our new SPF line.",
     location: "Bali, Indonesia",
     imageUrl:
@@ -63,7 +71,7 @@ const campaignCards: CampaignCard[] = [
   },
   {
     title: "Luxe Travel",
-    price: "€680",
+    price: "\u20AC680",
     description: "Showcase the blue domes and luxury villas.",
     location: "Santorini, Greece",
     imageUrl:
@@ -71,7 +79,7 @@ const campaignCards: CampaignCard[] = [
   },
   {
     title: "EcoStay Resorts",
-    price: "€520",
+    price: "\u20AC520",
     description: "Eco-friendly resort lifestyle content needed.",
     location: "Tulum, Mexico",
     imageUrl:
@@ -106,6 +114,25 @@ function StatIcon({ name, colorClass }: { name: string; colorClass: string }) {
     );
   }
 
+  if (name === "message") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={`h-4 w-4 ${colorClass}`}>
+        <path
+          d="M4 7h16v10H8l-4 3V7z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M8 11h8M8 14h5"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" fill="none" className={`h-4 w-4 ${colorClass}`}>
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.7" />
@@ -119,12 +146,15 @@ export default function DashboardPage() {
     <div className="mx-auto w-full max-w-[1080px] space-y-7">
       <section className="reveal-enter" style={{ animationDelay: "40ms" }}>
         <h1 className="text-[38px] font-semibold leading-tight text-[#2f3747]">
-          Welcome back, Alex Rivera 
+          Welcome back, Alex Rivera
         </h1>
         <p className="mt-1 text-sm text-[#7c879b]">Ready to create some magic today?</p>
       </section>
 
-      <section className="reveal-enter grid gap-4 sm:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: "120ms" }}>
+      <section
+        className="reveal-enter grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
+        style={{ animationDelay: "120ms" }}
+      >
         {statCards.map((stat, index) => (
           <Link
             key={stat.label}

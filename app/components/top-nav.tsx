@@ -79,7 +79,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
             onClick={onMenuToggle}
-            className="tap-press inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-[#eceef4] md:hidden"
+            className="tap-press inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-white md:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
               {mobileMenuOpen ? (
@@ -90,7 +90,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
             </svg>
           </button>
 
-          <label className="hidden w-full max-w-[460px] items-center gap-3 rounded-full bg-[#efeff2] px-4 py-2.5 transition focus-within:bg-white md:flex">
+          <label className="hidden w-full max-w-[500px] items-center gap-3 rounded-full border border-[rgba(132,144,165,0.12)] bg-white/75 px-4 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition focus-within:border-[rgba(222,139,52,0.24)] focus-within:bg-white md:flex">
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-[#8d98ad]">
               <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
               <path d="M16 16l4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -112,7 +112,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
               setNotificationsOpen(false);
               setProfileOpen(false);
             }}
-            className="tap-press inline-flex h-10 w-10 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-[#eceef4] md:hidden"
+            className="tap-press inline-flex h-10 w-10 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-white md:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
               <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
@@ -123,7 +123,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
           <div className="relative" ref={notificationRef}>
             <button
               type="button"
-              className="tap-press relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-[#eceef4]"
+              className="tap-press relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#4d5f7a] transition hover:bg-white"
               aria-label="Notifications"
               aria-expanded={notificationsOpen}
               onClick={() => {
@@ -154,7 +154,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
             </button>
 
             {notificationsOpen && (
-              <div className="pop-enter absolute right-0 top-12 z-10 w-[300px] rounded-xl border border-[#e1e3e8] bg-white p-3 shadow-[0_12px_24px_rgba(16,24,40,0.12)] sm:w-80">
+              <div className="pop-enter absolute right-0 top-12 z-10 w-[300px] rounded-2xl border border-[rgba(132,144,165,0.14)] bg-white/96 p-3 shadow-[0_18px_40px_rgba(16,24,40,0.14)] backdrop-blur sm:w-80">
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-sm font-semibold text-[#1f2430]">Notifications</p>
                   <button
@@ -186,7 +186,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
                 setProfileOpen((current) => !current);
                 setNotificationsOpen(false);
               }}
-              className="tap-press flex items-center gap-2 rounded-xl px-1 py-1 transition hover:bg-[#eceef4] sm:px-2"
+              className="tap-press flex items-center gap-2 rounded-2xl px-1 py-1 transition hover:bg-white sm:px-2"
               aria-expanded={profileOpen}
               aria-label="Profile menu"
             >
@@ -204,7 +204,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
             </button>
 
             {profileOpen && (
-              <div className="pop-enter absolute right-0 top-12 z-10 w-56 rounded-xl border border-[#e1e3e8] bg-white p-2 shadow-[0_12px_24px_rgba(16,24,40,0.12)]">
+              <div className="pop-enter absolute right-0 top-12 z-10 w-56 rounded-2xl border border-[rgba(132,144,165,0.14)] bg-white/96 p-2 shadow-[0_18px_40px_rgba(16,24,40,0.14)] backdrop-blur">
                 <Link
                   href="/profile"
                   onClick={() => setProfileOpen(false)}
@@ -242,7 +242,7 @@ export default function TopNav({ mobileMenuOpen, onMenuToggle }: TopNavProps) {
 
       {mobileSearchOpen && (
         <div className="pb-3 md:hidden">
-          <label className="flex w-full items-center gap-3 rounded-full bg-[#efeff2] px-4 py-2.5 transition focus-within:bg-white">
+          <label className="flex w-full items-center gap-3 rounded-full border border-[rgba(132,144,165,0.12)] bg-white/78 px-4 py-2.5 transition focus-within:border-[rgba(222,139,52,0.24)] focus-within:bg-white">
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-[#8d98ad]">
               <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
               <path d="M16 16l4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />

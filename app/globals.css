@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f3ef;
+  --background: #f5efe7;
   --foreground: #2f3747;
+  --surface: rgba(255, 255, 255, 0.76);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --border-soft: rgba(138, 120, 96, 0.16);
 }
 
 @theme inline {
@@ -13,9 +16,36 @@
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(247, 173, 74, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(79, 111, 211, 0.12), transparent 22%),
+    linear-gradient(180deg, #faf4ec 0%, #f6f1ea 45%, #f3eee8 100%);
   color: var(--foreground);
   font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::selection {
+  background: rgba(222, 139, 52, 0.18);
+  color: #2f3747;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(222, 139, 52, 0.75), rgba(227, 109, 88, 0.7));
+  background-clip: padding-box;
 }
 
 @keyframes pageIn {
@@ -61,37 +91,45 @@ body {
 }
 
 .page-enter {
-  animation: pageIn 0.45s ease-out both;
+  animation: pageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .nav-enter {
-  animation: navIn 0.35s ease-out both;
+  animation: navIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .reveal-enter {
-  animation: revealIn 0.45s ease-out both;
+  animation: revealIn 0.5s ease-out both;
 }
 
 .pop-enter {
-  animation: popIn 0.4s ease-out both;
+  animation: popIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hover-lift {
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), background-color 220ms ease, border-color 220ms ease;
 }
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
-  background-color: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.09);
+  background-color: rgba(255, 255, 255, 0.96);
 }
 
 .tap-press {
-  transition: transform 120ms ease;
+  transition: transform 140ms ease, filter 140ms ease;
 }
 
 .tap-press:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
+  filter: saturate(1.02);
+}
+
+.workspace-panel {
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(18px);
 }
 
 @media (prefers-reduced-motion: reduce) {
