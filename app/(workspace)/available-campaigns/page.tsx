@@ -1,5 +1,7 @@
 "use client";
 
+import DateRangePicker from "@/app/components/date-range-picker";
+import FilterDropdown from "@/app/components/filter-dropdown";
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useState } from "react";
 
@@ -97,7 +99,6 @@ const campaigns: Campaign[] = [
   },
 ];
 
-const platformOptions = ["All Platforms", "Instagram", "TikTok", "UGC Ads", "YouTube"];
 const categoryOptions = [
   "All Categories",
   "Beauty",
@@ -113,12 +114,6 @@ const budgetOptions = [
   "\u20AC400-\u20AC599",
   "\u20AC600+",
 ];
-const deadlineOptions = [
-  "Any Deadline",
-  "This Week",
-  "Next 7 Days",
-  "Next 14 Days",
-];
 
 function parseBudgetValue(value: string) {
   return Number(value.replace(/[^\d]/g, ""));
@@ -132,10 +127,15 @@ export default function AvailableCampaignsPage() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [appliedCampaignIds, setAppliedCampaignIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState("All Platforms");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedBudgetRange, setSelectedBudgetRange] = useState("All Budgets");
-  const [selectedDeadlineRange, setSelectedDeadlineRange] = useState("Any Deadline");
+  const [deadlineFilterStartDate, setDeadlineFilterStartDate] = useState("");
+  const [deadlineFilterEndDate, setDeadlineFilterEndDate] = useState("");
+  const [deadlinePickerOpen, setDeadlinePickerOpen] = useState(false);
+  const [applicationMotivation, setApplicationMotivation] = useState("");
+  const [travelStartDate, setTravelStartDate] = useState("");
+  const [travelEndDate, setTravelEndDate] = useState("");
+  const [travelPickerOpen, setTravelPickerOpen] = useState(false);
 
   const handleApply = (campaignId: number) => {
     setAppliedCampaignIds((current) =>
@@ -143,23 +143,38 @@ export default function AvailableCampaignsPage() {
     );
   };
 
-  const filteredCampaigns = useMemo(() => {
-    const today = new Date("2026-03-10T00:00:00");
+  const openCampaignModal = (campaign: Campaign) => {
+    setApplicationMotivation("");
+    setTravelStartDate("");
+    setTravelEndDate("");
+    setSelectedCampaign(campaign);
+  };
 
+  const closeCampaignModal = () => {
+    setSelectedCampaign(null);
+    setApplicationMotivation("");
+    setTravelStartDate("");
+    setTravelEndDate("");
+  };
+
+  const filteredCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => {
       const normalizedQuery = searchQuery.trim().toLowerCase();
       const budgetValue = parseBudgetValue(campaign.budget);
+      const startDate = parseCampaignDate(campaign.startDate);
       const deadlineDate = parseCampaignDate(campaign.endDate);
-      const deadlineDelta =
-        Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const filterStartDate = deadlineFilterStartDate
+        ? parseCampaignDate(deadlineFilterStartDate)
+        : null;
+      const filterEndDate = deadlineFilterEndDate
+        ? parseCampaignDate(deadlineFilterEndDate)
+        : filterStartDate;
 
       const matchesQuery =
         normalizedQuery.length === 0 ||
         `${campaign.brand} ${campaign.title} ${campaign.location}`
           .toLowerCase()
           .includes(normalizedQuery);
-      const matchesPlatform =
-        selectedPlatform === "All Platforms" || campaign.platform === selectedPlatform;
       const matchesCategory =
         selectedCategory === "All Categories" || campaign.category === selectedCategory;
       const matchesBudget =
@@ -170,14 +185,15 @@ export default function AvailableCampaignsPage() {
           budgetValue <= 599) ||
         (selectedBudgetRange === "\u20AC600+" && budgetValue >= 600);
       const matchesDeadline =
-        selectedDeadlineRange === "Any Deadline" ||
-        (selectedDeadlineRange === "This Week" && deadlineDelta >= 0 && deadlineDelta <= 7) ||
-        (selectedDeadlineRange === "Next 7 Days" && deadlineDelta >= 0 && deadlineDelta <= 7) ||
-        (selectedDeadlineRange === "Next 14 Days" && deadlineDelta >= 0 && deadlineDelta <= 14);
+        !filterStartDate ||
+        (() => {
+          const filterStart = filterStartDate.getTime();
+          const filterEnd = (filterEndDate ?? filterStartDate).getTime();
+          return startDate.getTime() <= filterEnd && deadlineDate.getTime() >= filterStart;
+        })();
 
       return (
         matchesQuery &&
-        matchesPlatform &&
         matchesCategory &&
         matchesBudget &&
         matchesDeadline
@@ -185,10 +201,10 @@ export default function AvailableCampaignsPage() {
     });
   }, [
     searchQuery,
-    selectedPlatform,
     selectedCategory,
     selectedBudgetRange,
-    selectedDeadlineRange,
+    deadlineFilterStartDate,
+    deadlineFilterEndDate,
   ]);
 
   useEffect(() => {
@@ -214,7 +230,7 @@ export default function AvailableCampaignsPage() {
   const campaignModal = selectedCampaign ? (
     <div
       className="fixed inset-0 z-[120] overflow-y-auto bg-[#0e1420]/55 px-4 py-6"
-      onClick={() => setSelectedCampaign(null)}
+      onClick={closeCampaignModal}
     >
       <div
         className="pop-enter relative mx-auto my-4 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-[0_24px_52px_rgba(15,23,42,0.25)] max-h-[90vh] overflow-y-auto"
@@ -229,7 +245,7 @@ export default function AvailableCampaignsPage() {
           </div>
           <button
             type="button"
-            onClick={() => setSelectedCampaign(null)}
+            onClick={closeCampaignModal}
             className="tap-press rounded-full p-2 text-[#7d889a] transition hover:bg-[#f2f5fb] hover:text-[#2f3747]"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
@@ -268,10 +284,34 @@ export default function AvailableCampaignsPage() {
           </p>
         </div>
 
+        <div className="mt-4 rounded-2xl bg-[#f8fafc] p-4">
+          <p className="text-xs text-[#8b97ab]">Why You&apos;re a Fit</p>
+          <textarea
+            rows={4}
+            value={applicationMotivation}
+            onChange={(event) => setApplicationMotivation(event.target.value)}
+            placeholder="Write your motivation for applying, how you would approach the content, and why this campaign matches your trip or audience."
+            className="mt-2 w-full rounded-2xl border border-[#d7dfea] bg-white px-4 py-3 text-sm text-[#3d4860] outline-none focus:border-[#b7c5df]"
+          />
+        </div>
+
+        <div className="mt-4 rounded-2xl bg-[#f8fafc] p-4">
+          <p className="text-xs text-[#8b97ab]">Travel Dates</p>
+          <button
+            type="button"
+            onClick={() => setTravelPickerOpen(true)}
+            className="tap-press mt-3 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-[#4c5b76] ring-1 ring-[#d7dfea] transition hover:bg-[#f7fafc]"
+          >
+            {travelStartDate && travelEndDate
+              ? `${travelStartDate} to ${travelEndDate}`
+              : "Pick Travel Dates"}
+          </button>
+        </div>
+
         <div className="mt-5 flex justify-end gap-2">
           <button
             type="button"
-            onClick={() => setSelectedCampaign(null)}
+            onClick={closeCampaignModal}
             className="tap-press rounded-xl border border-[#dce3f0] bg-white px-4 py-2 text-sm font-medium text-[#4d5c78] transition hover:bg-[#f2f5fb]"
           >
             Close
@@ -310,72 +350,7 @@ export default function AvailableCampaignsPage() {
         </p>
       </section>
 
-      <section className="reveal-enter hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4" style={{ animationDelay: "80ms" }}>
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Open Campaigns</p>
-              <p className="mt-1 text-[28px] font-semibold leading-none text-[#2f3747]">24</p>
-              <p className="mt-2 text-xs text-[#8d98ad]">+4 this week</p>
-            </div>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#eef3ff] text-[#5a74c6]">
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-                <rect x="3" y="4" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M3 9.5h18" stroke="currentColor" strokeWidth="1.8" />
-              </svg>
-            </span>
-          </div>
-        </article>
-
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Avg Budget</p>
-              <p className="mt-1 text-[28px] font-semibold leading-none text-[#2f3747]">{"\u20AC"}543</p>
-              <p className="mt-2 text-xs text-[#8d98ad]">Per campaign</p>
-            </div>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#fff0e4] text-[#df8b37]">
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-                <path d="M15.8 6.5H10a3.5 3.5 0 000 7h4.8m-4.8 4h5.8M7.2 10h9.4M7.2 14h8.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-          </div>
-        </article>
-
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Best Platform</p>
-              <p className="mt-1 text-[28px] font-semibold leading-none text-[#2f3747]">Instagram</p>
-              <p className="mt-2 text-xs text-[#8d98ad]">41% of listings</p>
-            </div>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#eaf8f1] text-[#4f9a72]">
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-                <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
-              </svg>
-            </span>
-          </div>
-        </article>
-
-        <article className="hover-lift rounded-2xl border border-[#e8ebf1] bg-white p-4 shadow-[0_4px_12px_rgba(27,39,64,0.05)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#8d98ad]">Ending Soon</p>
-              <p className="mt-1 text-[28px] font-semibold leading-none text-[#2f3747]">6</p>
-              <p className="mt-2 text-xs text-[#8d98ad]">Need response today</p>
-            </div>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#fdecef] text-[#d65778]">
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-                <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M12 7.5V12l3 1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-          </div>
-        </article>
-      </section>
-
-      <section className="reveal-enter rounded-2xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]" style={{ animationDelay: "140ms" }}>
+      <section className="reveal-enter relative z-30 rounded-2xl bg-[#fbfbfc] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]" style={{ animationDelay: "140ms" }}>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <svg viewBox="0 0 24 24" fill="none" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#95a2b5]">
@@ -390,50 +365,37 @@ export default function AvailableCampaignsPage() {
               className="w-full rounded-xl bg-white py-2.5 pl-10 pr-4 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1] focus:ring-[#b7c5df]"
             />
           </div>
-          <select
-            value={selectedPlatform}
-            onChange={(event) => setSelectedPlatform(event.target.value)}
-            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
-          >
-            {platformOptions.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-          <select
+          <FilterDropdown
+            options={categoryOptions}
             value={selectedCategory}
-            onChange={(event) => setSelectedCategory(event.target.value)}
-            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
-          >
-            {categoryOptions.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-          <select
+            onChange={setSelectedCategory}
+          />
+          <FilterDropdown
+            options={budgetOptions}
             value={selectedBudgetRange}
-            onChange={(event) => setSelectedBudgetRange(event.target.value)}
-            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
+            onChange={setSelectedBudgetRange}
+          />
+          <button
+            type="button"
+            onClick={() => setDeadlinePickerOpen(true)}
+            className="ui-select-wrap tap-press min-w-[220px] text-left"
           >
-            {budgetOptions.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-          <select
-            value={selectedDeadlineRange}
-            onChange={(event) => setSelectedDeadlineRange(event.target.value)}
-            className="rounded-xl bg-white px-3 py-2.5 text-sm text-[#3d4860] outline-none ring-1 ring-[#e6eaf1]"
-          >
-            {deadlineOptions.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
+            <span className="ui-select flex items-center justify-between">
+              <span>
+                {deadlineFilterStartDate && deadlineFilterEndDate
+                  ? `${deadlineFilterStartDate} to ${deadlineFilterEndDate}`
+                  : "Any Date"}
+              </span>
+            </span>
+          </button>
           <button
             type="button"
             onClick={() => {
               setSearchQuery("");
-              setSelectedPlatform("All Platforms");
               setSelectedCategory("All Categories");
               setSelectedBudgetRange("All Budgets");
-              setSelectedDeadlineRange("Any Deadline");
+              setDeadlineFilterStartDate("");
+              setDeadlineFilterEndDate("");
             }}
             className="tap-press inline-flex items-center gap-2 rounded-xl bg-[#2f3747] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#252c39]"
           >
@@ -442,7 +404,7 @@ export default function AvailableCampaignsPage() {
         </div>
       </section>
 
-      <section className="reveal-enter grid gap-4 md:grid-cols-2 xl:grid-cols-3" style={{ animationDelay: "220ms" }}>
+      <section className="reveal-enter relative z-0 grid gap-4 md:grid-cols-2 xl:grid-cols-3" style={{ animationDelay: "220ms" }}>
         {filteredCampaigns.map((campaign) => (
           <article
             key={campaign.id}
@@ -498,7 +460,7 @@ export default function AvailableCampaignsPage() {
             <div className="mt-4 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => setSelectedCampaign(campaign)}
+                onClick={() => openCampaignModal(campaign)}
                 className="tap-press inline-flex items-center justify-center gap-1 rounded-xl border border-[#dde3f0] bg-white px-3 py-2 text-center text-sm font-medium text-[#4c5b76] transition hover:bg-[#f2f5fb]"
               >
                 <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
@@ -546,6 +508,34 @@ export default function AvailableCampaignsPage() {
       </section>
 
       {campaignModal && createPortal(campaignModal, document.body)}
+      <DateRangePicker
+        key={`travel-${travelPickerOpen}-${travelStartDate}-${travelEndDate}`}
+        isOpen={travelPickerOpen}
+        initialStartDate={travelStartDate}
+        initialEndDate={travelEndDate}
+        onClose={() => setTravelPickerOpen(false)}
+        onConfirm={({ startDate, endDate }) => {
+          setTravelStartDate(startDate);
+          setTravelEndDate(endDate);
+          setTravelPickerOpen(false);
+        }}
+      />
+      <DateRangePicker
+        key={`deadline-${deadlinePickerOpen}-${deadlineFilterStartDate}-${deadlineFilterEndDate}`}
+        isOpen={deadlinePickerOpen}
+        initialStartDate={deadlineFilterStartDate}
+        initialEndDate={deadlineFilterEndDate}
+        onClose={() => setDeadlinePickerOpen(false)}
+        onConfirm={({ startDate, endDate }) => {
+          setDeadlineFilterStartDate(startDate);
+          setDeadlineFilterEndDate(endDate);
+          setDeadlinePickerOpen(false);
+        }}
+      />
     </div>
   );
 }
+
+
+
+

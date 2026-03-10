@@ -1,5 +1,6 @@
 "use client";
 
+import DateRangePicker from "@/app/components/date-range-picker";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
@@ -44,6 +45,9 @@ export default function CreatorCampaignForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const [campaignDatePickerOpen, setCampaignDatePickerOpen] = useState(false);
+  const [applicationDeadlinePickerOpen, setApplicationDeadlinePickerOpen] =
+    useState(false);
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
@@ -263,23 +267,19 @@ export default function CreatorCampaignForm({
               </label>
 
               <label>
-                <span className="text-sm font-medium text-[#445066]">Campaign start date</span>
-                <input
-                  type="date"
-                  value={formState.startDate}
-                  onChange={(event) => updateField("startDate", event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[#e5e9f1] bg-[#fbfbfc] px-4 py-3 text-sm text-[#2f3747] outline-none transition focus:border-[#bdcadf]"
-                />
-              </label>
-
-              <label>
-                <span className="text-sm font-medium text-[#445066]">Campaign end date</span>
-                <input
-                  type="date"
-                  value={formState.endDate}
-                  onChange={(event) => updateField("endDate", event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-[#e5e9f1] bg-[#fbfbfc] px-4 py-3 text-sm text-[#2f3747] outline-none transition focus:border-[#bdcadf]"
-                />
+                <span className="text-sm font-medium text-[#445066]">Campaign dates</span>
+                <button
+                  type="button"
+                  onClick={() => setCampaignDatePickerOpen(true)}
+                  className="mt-2 flex w-full items-center justify-between rounded-2xl border border-[#e5e9f1] bg-[#fbfbfc] px-4 py-3 text-left text-sm text-[#2f3747] outline-none transition hover:border-[#cad4e4] focus:border-[#bdcadf]"
+                >
+                  <span>
+                    {formState.startDate && formState.endDate
+                      ? `${formState.startDate} to ${formState.endDate}`
+                      : "Pick campaign dates"}
+                  </span>
+                  <span className="text-[#8f99ad]">{"\u25BE"}</span>
+                </button>
               </label>
 
               <label>
@@ -294,14 +294,16 @@ export default function CreatorCampaignForm({
 
               <label>
                 <span className="text-sm font-medium text-[#445066]">Application deadline</span>
-                <input
-                  type="date"
-                  value={formState.applicationDeadline}
-                  onChange={(event) =>
-                    updateField("applicationDeadline", event.target.value)
-                  }
-                  className="mt-2 w-full rounded-2xl border border-[#e5e9f1] bg-[#fbfbfc] px-4 py-3 text-sm text-[#2f3747] outline-none transition focus:border-[#bdcadf]"
-                />
+                <button
+                  type="button"
+                  onClick={() => setApplicationDeadlinePickerOpen(true)}
+                  className="mt-2 flex w-full items-center justify-between rounded-2xl border border-[#e5e9f1] bg-[#fbfbfc] px-4 py-3 text-left text-sm text-[#2f3747] outline-none transition hover:border-[#cad4e4] focus:border-[#bdcadf]"
+                >
+                  <span>
+                    {formState.applicationDeadline || "Pick application deadline"}
+                  </span>
+                  <span className="text-[#8f99ad]">{"\u25BE"}</span>
+                </button>
               </label>
             </div>
           </article>
@@ -460,6 +462,32 @@ export default function CreatorCampaignForm({
           </button>
         </section>
       </form>
+      <DateRangePicker
+        key={`campaign-${campaignDatePickerOpen}-${formState.startDate}-${formState.endDate}`}
+        isOpen={campaignDatePickerOpen}
+        initialStartDate={formState.startDate}
+        initialEndDate={formState.endDate}
+        onClose={() => setCampaignDatePickerOpen(false)}
+        onConfirm={({ startDate, endDate }) => {
+          updateField("startDate", startDate);
+          updateField("endDate", endDate);
+          setCampaignDatePickerOpen(false);
+        }}
+      />
+      <DateRangePicker
+        key={`deadline-${applicationDeadlinePickerOpen}-${formState.applicationDeadline}`}
+        isOpen={applicationDeadlinePickerOpen}
+        initialStartDate={formState.applicationDeadline}
+        initialEndDate={formState.applicationDeadline}
+        selectionMode="single"
+        onClose={() => setApplicationDeadlinePickerOpen(false)}
+        onConfirm={({ startDate }) => {
+          updateField("applicationDeadline", startDate);
+          setApplicationDeadlinePickerOpen(false);
+        }}
+      />
     </div>
   );
 }
+
+
