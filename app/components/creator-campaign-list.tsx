@@ -49,17 +49,6 @@ export default function CreatorCampaignList() {
 
   return (
     <div className="mx-auto w-full max-w-[1080px] space-y-6">
-      <section className="reveal-enter flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold text-[#2f3747]">Campaign Offers</h1>
-          <p className="mt-1 text-sm text-[#7c879b]">
-            Create travel and content offers that brands can discover without affecting the
-            existing brand campaign marketplace.
-          </p>
-        </div>
-        <CreateCampaignButton />
-      </section>
-
       <section className="reveal-enter space-y-4" style={{ animationDelay: "140ms" }}>
         {campaigns.length === 0 ? (
           <article className="rounded-3xl bg-white p-8 text-center shadow-[0_4px_14px_rgba(27,39,64,0.05)]">
@@ -75,7 +64,7 @@ export default function CreatorCampaignList() {
           campaigns.map((campaign, index) => (
             <article
               key={campaign.id}
-              className="reveal-enter overflow-hidden rounded-3xl bg-[#fbfbfc] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+              className="reveal-enter hover-lift overflow-hidden rounded-3xl bg-[#fbfbfc] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
               style={{ animationDelay: `${180 + index * 50}ms` }}
             >
               <div className="grid gap-0 lg:grid-cols-[280px_1fr]">

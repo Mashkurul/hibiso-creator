@@ -16,6 +16,8 @@ type CreatorCampaignFormProps = {
   campaignId?: string;
 };
 
+const creatorCampaignsHref = "/available-campaigns?mode=travel";
+
 function formatPageCopy(campaignId?: string) {
   if (campaignId) {
     return {
@@ -159,7 +161,7 @@ export default function CreatorCampaignForm({
     setError("");
     setSaving(true);
     upsertCreatorCampaign(formState, intent, campaignId);
-    router.push("/campaign-offers");
+    router.push(creatorCampaignsHref);
     router.refresh();
   };
 
@@ -187,10 +189,10 @@ export default function CreatorCampaignForm({
             This creator campaign does not exist in the current workspace.
           </p>
           <Link
-            href="/campaign-offers"
+            href={creatorCampaignsHref}
             className="mt-5 inline-flex rounded-full bg-[#2f3747] px-4 py-2 text-sm font-semibold text-white"
           >
-            Back to Campaign Offers
+            Back to Campaigns
           </Link>
         </section>
       </div>
@@ -208,10 +210,10 @@ export default function CreatorCampaignForm({
           <p className="mt-2 max-w-2xl text-sm text-[#7c879b]">{copy.description}</p>
         </div>
         <Link
-          href="/campaign-offers"
+          href={creatorCampaignsHref}
           className="tap-press rounded-full border border-[#dde3f0] bg-white px-4 py-2.5 text-sm font-medium text-[#4c5b76] transition hover:bg-[#f2f5fb]"
         >
-          View Campaign Offers
+          View Campaigns
         </Link>
       </section>
 
@@ -440,7 +442,7 @@ export default function CreatorCampaignForm({
 
         <section className="reveal-enter flex flex-wrap items-center justify-end gap-3 pb-4">
           <Link
-            href="/campaign-offers"
+            href={creatorCampaignsHref}
             className="tap-press rounded-full border border-[#dde3f0] bg-white px-4 py-2.5 text-sm font-medium text-[#4c5b76] transition hover:bg-[#f2f5fb]"
           >
             Cancel

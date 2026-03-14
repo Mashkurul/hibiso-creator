@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Available Campaigns",
+    label: "Campaigns",
     href: "/available-campaigns",
     icon: (
       <IconWrapper>
@@ -43,21 +43,6 @@ const navItems: NavItem[] = [
           <rect x="3" y="6" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
           <path d="M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6" stroke="currentColor" strokeWidth="1.8" />
           <path d="M3 11h18" stroke="currentColor" strokeWidth="1.8" />
-        </svg>
-      </IconWrapper>
-    ),
-  },
-  {
-    label: "Campaign Offers",
-    href: "/campaign-offers",
-    icon: (
-      <IconWrapper>
-        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-          <path
-            d="M5 7.5A2.5 2.5 0 017.5 5H11l2 2h3.5A2.5 2.5 0 0119 9.5v7a2.5 2.5 0 01-2.5 2.5h-9A2.5 2.5 0 015 16.5v-9z"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
         </svg>
       </IconWrapper>
     ),
